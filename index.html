@@ -629,6 +629,62 @@ h1,h2,h3{ font-family:var(--f-display); font-weight:300; line-height:1.15; }
 }
 
 /* ═══════════════════════════════════════════════
+   12b. BLOG — PUN TEKST (modal)
+   ═══════════════════════════════════════════════ */
+#artikal{
+  position:fixed; inset:0; z-index:60;
+  background:rgba(46,49,52,.6);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:1rem; overflow-y:auto;
+  opacity:0; pointer-events:none; transition:opacity .35s ease;
+}
+@media (min-width:768px){ #artikal{ padding:3rem 2rem; } }
+#artikal.open{ opacity:1; pointer-events:auto; }
+.art-box{
+  position:relative; background:var(--bez-50);
+  max-width:44rem; width:100%; margin:auto;
+  transform:translateY(18px); transition:transform .4s cubic-bezier(.2,.8,.3,1);
+}
+#artikal.open .art-box{ transform:none; }
+.art-hero{ aspect-ratio:16/7; background:var(--bez-100); overflow:hidden; }
+.art-hero img{ width:100%; height:100%; object-fit:cover; }
+.art-body{ padding:2rem 1.75rem 2.75rem; }
+@media (min-width:768px){ .art-body{ padding:3rem 3.5rem 3.5rem; } }
+.art-body h2{ font-size:2rem; line-height:1.2; margin-bottom:1.5rem; }
+@media (min-width:768px){ .art-body h2{ font-size:2.5rem; } }
+.art-body .hairline{ width:5rem; margin-bottom:2rem; }
+.art-text p{ color:var(--antracit-soft); line-height:1.85; margin-bottom:1.25rem; }
+.art-text h4{
+  font-family:var(--f-display); font-size:1.375rem; font-weight:400;
+  color:var(--antracit); margin:2.25rem 0 .875rem;
+}
+.art-text strong{ color:var(--antracit); font-weight:500; }
+.art-text ul{ margin:0 0 1.5rem; }
+.art-text li{
+  position:relative; padding-left:1.5rem; margin-bottom:.75rem;
+  color:var(--antracit-soft); line-height:1.8;
+}
+.art-text li::before{
+  content:''; position:absolute; left:0; top:.75em;
+  width:.5rem; height:1px; background:var(--zelena);
+}
+.art-cta{
+  margin-top:2.5rem; padding-top:2rem; border-top:1px solid var(--bez-200);
+  display:flex; flex-wrap:wrap; align-items:center; gap:1.25rem;
+}
+.art-cta p{ font-size:.875rem; color:var(--antracit-muted); }
+#art-close{
+  position:absolute; top:1rem; right:1rem; z-index:2;
+  width:2.75rem; height:2.75rem; font-size:1.75rem; font-weight:300;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(251,248,243,.9); color:var(--antracit);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  transition:background-color .3s ease, color .3s ease;
+}
+#art-close:hover{ background:var(--braon); color:var(--bez-50); }
+
+/* ═══════════════════════════════════════════════
    13. FOOTER
    ═══════════════════════════════════════════════ */
 footer{ background:var(--antracit); color:var(--bez-100); padding-top:5rem; padding-bottom:2.5rem; }
@@ -680,6 +736,7 @@ footer{ background:var(--antracit); color:var(--bez-100); padding-top:5rem; padd
 a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   outline:2px solid var(--braon); outline-offset:3px;
 }
+.post:focus-visible{ outline:2px solid var(--braon); outline-offset:6px; }
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
   *,*::before,*::after{ animation:none !important; transition:none !important; }
@@ -1008,11 +1065,32 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
         <p class="eyebrow">Blog</p>
         <h2>Pišemo o onome što nas pitate</h2>
       </div>
-      <a href="#" class="blog-all">Svi tekstovi &#8594;</a>
     </div>
     <div id="blog-grid"></div>
   </div>
 </section>
+
+<!-- ══════════ BLOG — PUN TEKST ══════════ -->
+<div id="artikal" role="dialog" aria-modal="true" aria-labelledby="art-naslov">
+  <article class="art-box">
+    <button id="art-close" aria-label="Zatvori tekst">&times;</button>
+    <div class="art-hero"><img id="art-slika" src="" alt=""></div>
+    <div class="art-body">
+      <div class="post-meta">
+        <span class="post-tag" id="art-tag"></span>
+        <span class="post-dash"></span>
+        <span class="post-time" id="art-vreme"></span>
+      </div>
+      <h2 id="art-naslov"></h2>
+      <div class="hairline"></div>
+      <div class="art-text" id="art-telo"></div>
+      <div class="art-cta">
+        <a href="#zakazivanje" class="btn btn--solid" id="art-zakazi">Zakaži termin</a>
+        <p>Imate pitanje? Pišite nam na Instagramu.</p>
+      </div>
+    </div>
+  </article>
+</div>
 
 <!-- ══════════ FOOTER ══════════ -->
 <footer>
@@ -1074,27 +1152,174 @@ const galerija = [
   {cat:'nokti',     src:'laser.png',       naslov:'Lasersko uklanjanje dlačica',    kat:'Manikir & Pedikir'}
 ];
 
+/* ═══════════ BLOG — TEKSTOVI ═══════════
+   Za novi tekst: kopirajte jedan objekat iz niza i izmenite polja.
+   `tekst` = kratak uvod na kartici, `telo` = pun tekst u modalu.
+   ══════════════════════════════════════ */
 const blogovi = [
   {
     slika:'blog-sters.png',
     tag:'SPA & mentalno zdravlje',
     naslov:'Telo pamti stres i kada ga vi zaboravite',
-    tekst:'Ne spavate loše zato što ste „nervozni“. Spavate loše jer vam ramena mesecima nisu spuštena ispod ušiju. Hronični stres se ne zadržava u glavi — sedne u trapez, u vilicu, u donji deo leđa i tu ostane. Devedeset minuta na stolu neće rešiti razlog zbog kog ste napeti, ali će vaše telo prvi put posle dugo vremena dobiti signal da može da se opusti.',
-    vreme:'4 min'
+    vreme:'4 min',
+    tekst:'Ne spavate loše zato što ste „nervozni“. Spavate loše jer vam ramena mesecima nisu spuštena ispod ušiju. Hronični stres se ne zadržava u glavi — sedne u trapez, u vilicu, u donji deo leđa i tu ostane.',
+    telo:`
+<p>Dolazi kod nas žena od trideset osam godina i kaže: „Ništa mi nije, samo sam umorna.“ Legne na sto, spustim ruke na njena ramena i osetim dve ploče kamena. Pitam je kada joj je poslednji put neko dodirnuo leđa. Razmišlja predugo.</p>
+
+<p>To nije redak slučaj. To je pravilo.</p>
+
+<h4>Zašto stres uopšte završava u mišićima</h4>
+
+<p>Kada mozak proceni da postoji pretnja — rok na poslu, dug, svađa, nesigurnost — telo se priprema za akciju. Mišići se skraćuju, disanje postaje plitko, težina se prebacuje napred. To je koristan mehanizam kada pretnja traje minut. Problem nastaje kada traje <strong>osamnaest meseci</strong>.</p>
+
+<p>Telo ne pravi razliku između medveda i neplaćenog računa. Ostaje u istom položaju odbrane, samo mnogo duže nego što je predviđeno. Vremenom mišić prestaje da se vraća u opušteno stanje i to skraćenje postaje vaša nova „normala“. Ne primetite je jer se dešavala postepeno.</p>
+
+<h4>Kako izgleda kada se to nakupi</h4>
+
+<ul>
+  <li><strong>Ramena podignuta ka ušima</strong> — trapez je u stalnoj kontrakciji, često bez ijedne bolne tačke, samo tvrd</li>
+  <li><strong>Glavobolje koje kreću od potiljka</strong> — najčešće tenzione, ne migrene, iako se tako doživljavaju</li>
+  <li><strong>Stisnuta vilica noću</strong> — bruksizam; zubar ga primeti pre vas</li>
+  <li><strong>Plitko disanje u grudi</strong> — dijafragma se ne spušta do kraja, pa se telo nikada ne prebaci u stanje odmora</li>
+  <li><strong>San koji ne odmara</strong> — spavate sedam sati i budite se kao da niste legli</li>
+</ul>
+
+<h4>Šta masaža zaista radi — a šta ne</h4>
+
+<p>Budimo pošteni: masaža neće platiti vaše račune niti popraviti odnos koji vas iscrpljuje. Ali radi nešto što se teško postiže voljom.</p>
+
+<p>Pritisak na mišić i spor, predvidljiv ritam dodira šalju nervnom sistemu signal da je okolina bezbedna. Puls se spušta. Disanje se produbljuje. Telo prelazi iz režima odbrane u režim oporavka — i tek u tom stanju počinje stvarno da se opušta. Zato posle dobre masaže osetite težinu u nogama i mutnoću u glavi: to nije umor, to je prvi put posle mnogo vremena da vam telo nije na straži.</p>
+
+<h4>Zašto devedeset minuta, a ne trideset</h4>
+
+<p>Prvih dvadesetak minuta telo se testira. Mišić se opire, disanje ostaje plitko, glava još uvek prolazi kroz spisak obaveza. Tek negde oko trideset petog minuta dolazi prelom — telo shvati da nema šta da brani i pusti se. Sve što se dešava posle toga je stvarna korist tretmana.</p>
+
+<p>Zato u M.R. Beauty ne prodajemo tretmane od dvadeset minuta. Nema smisla platiti nešto što se prekida tačno u trenutku kada počinje da deluje.</p>
+
+<h4>Koliko često</h4>
+
+<p>Ako se prvi put vraćate telu posle dužeg vremena, korisno je da prva tri termina budu na razmaku od sedam do deset dana. Posle toga jednom mesečno je sasvim dovoljno za održavanje. Nekome je dovoljno i na šest nedelja — zavisi od posla, sna i toga koliko sedite.</p>
+
+<h4>Kada masaža nije odgovor</h4>
+
+<p>Ako bol seva niz nogu ili ruku, ako se javlja trnjenje, ako traje bez prekida i noću, ili ako je nastao posle pada ili udarca — prvo lekar, pa tek onda mi. Masaža je odlična za napetost. Nije zamena za dijagnozu.</p>
+
+<p>Sve ostalo — ramena koja ne umeju da se spuste, leđa koja tupo bole od sedenja, vilicu koja se stisne čim pomislite na ponedeljak — možemo da rešimo zajedno.</p>
+`
   },
   {
     slika:'blog-sminka.png',
     tag:'Trajna šminka',
     naslov:'Koliko vas zaista košta dvadeset minuta pred ogledalom',
-    tekst:'Dvadeset minuta ujutru je sto dvadeset sati godišnje. Pet punih dana koje ste proveli crtajući obrve koje će do podneva izbledeti, i onda proveravajući ih na svakom izlogu. Trajna šminka nije lenjost — to je odluka da tih pet dana potrošite drugačije. Dolazite jednom, zatim na korekciju posle mesec dana, i sledeće dve godine se budite sa licem koje je već spremno.',
-    vreme:'5 min'
+    vreme:'5 min',
+    tekst:'Dvadeset minuta ujutru je sto dvadeset sati godišnje. Pet punih dana koje ste proveli crtajući obrve koje će do podneva izbledeti, i onda proveravajući ih na svakom izlogu.',
+    telo:`
+<p>Uzmite olovku i izračunajte sa nama.</p>
+
+<p>Dvadeset minuta ujutru, svakog radnog dana. To je sto sati godišnje. Dodajte vikende, izlaske, one dane kada se šminkate dva puta — dolazite blizu <strong>sto pedeset sati</strong>. Šest punih dana i noći, godišnje, ispred ogledala.</p>
+
+<p>To je ono što trajna šminka zapravo košta. Ne cena tretmana — cena njenog odsustva.</p>
+
+<h4>Šta trajna šminka jeste</h4>
+
+<p>Pigment se unosi u gornji sloj kože, plitko — mnogo plitko u odnosu na tetovažu. Zato bledi i zato ima rok trajanja. To nije mana, to je poenta: mode se menjaju, lice se menja, i dobro je da rezultat ne ostane zauvek.</p>
+
+<p>Tri najtraženija tretmana kod nas:</p>
+
+<ul>
+  <li><strong>Puder obrve</strong> — najmekši, najprirodniji finiš. Izgleda kao obrva blago popunjena senkom, bez oštrih ivica. Odgovara skoro svakom tipu kože, uključujući masnu, gde tehnika dlačica ne opstaje dobro.</li>
+  <li><strong>Lip blush</strong> — vraća boju usnama i vizuelno definiše ivicu bez efekta iscrtanog ruža. Posebno koristan ako su usne s godinama izgubile ton ili je kontura postala nepravilna.</li>
+  <li><strong>Trajni ajlajner</strong> — od nežne linije između trepavica do izraženijeg poteza. Najveća razlika u brzini jutarnje rutine, jer je ajlajner ono što se najteže povlači ravnom rukom.</li>
+</ul>
+
+<h4>Kako izgleda proces, iskreno</h4>
+
+<p><strong>Konsultacija.</strong> Pre nego što se bilo šta dodirne, sedimo i pričamo. Oblik lica, boja kose, koliko izražen rezultat želite, šta vas je do sada odbijalo. Oblik crtamo olovkom i gledate ga u ogledalu dok ne kažete da je to to. Niko ne uzima aparat dok se ne složimo.</p>
+
+<p><strong>Tretman.</strong> Anestetska krema deluje dvadesetak minuta. Sam rad traje između sat i po i dva sata. Osećaj većina opisuje kao grebanje ili vibraciju — neprijatno, ali daleko od onoga čega se ljudi plaše.</p>
+
+<p><strong>Prvih sedam dana.</strong> Ovo je deo o kome se najmanje priča, a najviše je bitan. Prva dva-tri dana rezultat je tamniji i oštriji nego što će biti. Zatim se stvara tanka kora koja se sama ljušti. <strong>Ne dirajte je.</strong> Kada otpadne, boja izgleda preblago — mnogi se tu uplaše. Nemojte. Pigment se „vraća“ do kraja treće nedelje.</p>
+
+<p><strong>Korekcija.</strong> Posle četiri do šest nedelja dolazite ponovo. Tada se dodaje ono što koža nije primila i fino podešava oblik. Korekcija nije opcija ni znak da nešto nije uspelo — ona je sastavni deo tretmana i uračunata je u cenu.</p>
+
+<h4>Šta rezultat kvari</h4>
+
+<ul>
+  <li>Sunce bez zaštite — najbrži način da pigment izbledi ili promeni ton</li>
+  <li>Solarijum, sauna i bazen u prve dve nedelje</li>
+  <li>Piling kiseline i retinol preko tretirane zone</li>
+  <li>Skidanje kore prstima</li>
+  <li>Masna koža — ne kvari rezultat, ali ga brže „proguta“, pa se osvežavanje radi nešto ranije</li>
+</ul>
+
+<h4>Koliko traje</h4>
+
+<p>Realno: od godinu i po do tri godine, u zavisnosti od tipa kože, izloženosti suncu i nege. Osvežavanje se radi jednom u godinu-dve i kraće je i jeftinije od prvog tretmana.</p>
+
+<h4>Kome ne preporučujemo</h4>
+
+<p>Trudnicama i dojiljama, osobama sa aktivnom infekcijom ili ekcemom u zoni tretmana, sklonim keloidnim ožiljcima, na terapiji koja utiče na zgrušavanje krvi, i onima koji su nedavno radili botoks ili filere u toj zoni — potrebno je sačekati. Ako ste u nekoj od ovih grupa, javite nam se svejedno; često je rešenje samo u pomeranju termina.</p>
+
+<h4>Najčešće pitanje koje dobijamo</h4>
+
+<p>„Da li će izgledati kao nacrtano?“</p>
+
+<p>Ako je urađeno dobro — ne. Ljudi oko vas neće znati da ste nešto radili, samo će vam govoriti da izgledate odmorno. To je i cilj. Trajna šminka koja se primeti nije loše urađena obrva; to je obrva urađena za nečije tuđe lice.</p>
+`
   },
   {
     slika:'alajner.png',
     tag:'Nega',
     naslov:'Šta da pitate pre nego što sednete u bilo koju stolicu',
+    vreme:'3 min',
     tekst:'Pigment, tehnika, sterilizacija, plan korekcije. Četiri pitanja koja razdvajaju salon od improvizacije — i koja bi svaki dobar majstor voleo da mu postavite.',
-    vreme:'3 min'
+    telo:`
+<p>Ovaj tekst radi protiv nas na kratke staze. Daje vam pitanja koja možete postaviti bilo kome, uključujući i konkurenciju. Pišemo ga svejedno, jer nam se u salon prečesto vraćaju ljudi da ispravljamo nečiji tuđi rad — a to je skuplje, bolnije i sporije nego da je odmah urađeno kako treba.</p>
+
+<p>Postavite ova četiri pitanja bilo gde. Dobar majstor će se obradovati.</p>
+
+<h4>1. „Kojim pigmentom radite i mogu li da vidim kutiju?“</h4>
+
+<p>Ozbiljni pigmenti imaju proizvođača, seriju i rok trajanja odštampan na ambalaži. To nije komercijalni detalj — to je ono što određuje kako će boja izbledeti za dve godine. Jeftini pigmenti nepoznatog porekla ne blede u lepši ton; odlaze u sivo, plavo ili crveno.</p>
+
+<p>Ako neko ne želi da vam pokaže ambalažu ili odgovori uopšteno — to je odgovor.</p>
+
+<h4>2. „Kako sterilišete i šta je jednokratno?“</h4>
+
+<p>Igla mora biti otvorena pred vama, iz zapečaćenog pakovanja. Rukavice se menjaju. Radna površina je pokrivena. Sve što dolazi u kontakt sa kožom je ili jednokratno ili prošlo kroz autoklav.</p>
+
+<p>Ovo nije preterivanje. Preko krvi se prenose hepatitis B, hepatitis C i HIV, a jedina zaštita je procedura koja se poštuje svaki put, i kada niko ne gleda.</p>
+
+<p>Tražite da vidite otvaranje igle. Ako se to doživi kao uvreda — nemojte sedati.</p>
+
+<h4>3. „Pokažite mi zaceljene radove, ne sveže“</h4>
+
+<p>Ovo je najkorisnije pitanje na celoj listi i najređe se postavlja.</p>
+
+<p>Svaki rad izgleda dobro pola sata posle tretmana. Koža je blago nadražena, pigment je pun, sve je oštro i simetrično. Prava provera je fotografija <strong>iste obrve mesec dana kasnije</strong>. Tada se vidi da li je oblik ostao, da li je boja otišla u sivo, da li je pigment primljen ravnomerno.</p>
+
+<p>Tražite parove fotografija: svež rad i isti taj rad posle korekcije. Ko ih ima, taj prati svoje klijente. Ko ih nema, ne prati.</p>
+
+<h4>4. „Šta ako mi se ne dopadne — kakav je plan korekcije?“</h4>
+
+<p>Odgovor treba da bude konkretan: kada je korekcija, da li je uračunata u cenu, šta se radi ako je oblik potrebno korigovati, koliko traje i koliko se čeka.</p>
+
+<p>„Biće savršeno, ne brinite“ nije plan. To je izbegavanje pitanja.</p>
+
+<h4>Peto pitanje, koje niko ne postavlja</h4>
+
+<p>„Da li biste mi ovo uopšte preporučili?“</p>
+
+<p>Dobar majstor će vam ponekad reći ne. Da vaša koža u tom trenutku nije u stanju za tretman. Da je bolje sačekati da prođe terapija. Da oblik koji ste doneli na fotografiji neće raditi na vašem licu i evo zašto. Da vam za ono što želite zapravo treba nešto drugo.</p>
+
+<p>Neko ko nikada ne kaže ne, prodaje. Ne radi.</p>
+
+<h4>I na kraju</h4>
+
+<p>Trajna šminka i tretmani nege su intervencije na vašem licu koje traju godinama. Zaslužuju bar onoliko pitanja koliko biste postavili prilikom kupovine telefona.</p>
+
+<p>Ako vam se pitanja čine neprijatnim — nisu. Nama je najlakše da radimo sa klijentom koji tačno zna šta pita.</p>
+`
   }
 ];
 
@@ -1414,9 +1639,10 @@ document.addEventListener('keydown', e => {
   osveziCTA();
 })();
 
-/* ═══════════ BLOG ═══════════ */
-document.getElementById('blog-grid').innerHTML = blogovi.map(b => `
-  <article class="post fade-up">
+/* ═══════════ BLOG — KARTICE ═══════════ */
+document.getElementById('blog-grid').innerHTML = blogovi.map((b,i) => `
+  <article class="post fade-up" data-b="${i}" tabindex="0" role="button"
+           aria-label="Otvori tekst: ${b.naslov}">
     <div class="post-media">
       <img src="${b.slika}" alt="${b.naslov}" loading="lazy" decoding="async">
     </div>
@@ -1429,6 +1655,56 @@ document.getElementById('blog-grid').innerHTML = blogovi.map(b => `
     <p class="post-excerpt">${b.tekst.slice(0,180)}…</p>
     <p class="post-more">Pročitaj &#8594;</p>
   </article>`).join('');
+
+/* ═══════════ BLOG — OTVARANJE PUNOG TEKSTA ═══════════ */
+(function(){
+  const modal  = document.getElementById('artikal');
+  const box    = modal.querySelector('.art-box');
+  const mreza  = document.getElementById('blog-grid');
+  let poslednjiFokus = null;
+
+  function otvoriTekst(i){
+    const b = blogovi[i];
+    if(!b) return;
+    const slika = document.getElementById('art-slika');
+    slika.src = b.slika;
+    slika.alt = b.naslov;
+    document.getElementById('art-tag').textContent    = b.tag;
+    document.getElementById('art-vreme').textContent  = b.vreme + ' čitanja';
+    document.getElementById('art-naslov').textContent = b.naslov;
+    document.getElementById('art-telo').innerHTML     = b.telo;
+
+    poslednjiFokus = document.activeElement;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    modal.scrollTop = 0;
+    box.scrollTop = 0;
+    document.getElementById('art-close').focus();
+  }
+
+  function zatvoriTekst(){
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    if(poslednjiFokus && typeof poslednjiFokus.focus === 'function') poslednjiFokus.focus();
+  }
+
+  mreza.addEventListener('click', e => {
+    const p = e.target.closest('.post');
+    if(p) otvoriTekst(+p.dataset.b);
+  });
+  mreza.addEventListener('keydown', e => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const p = e.target.closest('.post');
+    if(p){ e.preventDefault(); otvoriTekst(+p.dataset.b); }
+  });
+
+  document.getElementById('art-close').addEventListener('click', zatvoriTekst);
+  modal.addEventListener('click', e => { if(e.target === modal) zatvoriTekst(); });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && modal.classList.contains('open')) zatvoriTekst();
+  });
+  document.getElementById('art-zakazi').addEventListener('click', zatvoriTekst);
+})();
 
 /* ═══════════ INTERAKCIJE ═══════════ */
 const io = new IntersectionObserver(es => es.forEach(e => {
